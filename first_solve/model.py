@@ -19,6 +19,16 @@ class Book(Base):
     favorites: Mapped[bool] = mapped_column(Boolean)
     read: Mapped[bool] = mapped_column(Boolean)
 
+columns = {
+    "название": "name",
+    "автор": "author",
+    "жанр": "genre",
+    "дата": "date",
+    "описание": "description",
+    "избранное": "favorites",
+    "прочитано": "read",
+}
+
 def create_database():
     Base.metadata.create_all(engine)
 
@@ -90,9 +100,18 @@ def change_status_favorite(name: str):
         else:
             print(f"Книга {name} убрана из избранного")
 
+def change_details(name, field, value):
+    with Session(engine) as session:
+        book = session.query(Book).filter(Book.name == name).one()
+        setattr(book, columns[field], value)
+        session.commit()
+    print("Значение изменено")
+
+
+
 def delete_book(name):
     with Session(engine) as session:
-        book = session.query(Book).filter(Book.name == name).first()
+        book = session.query(Book).filter(Book.name == name).one()
         if book:
             session.delete(book)
             session.commit()

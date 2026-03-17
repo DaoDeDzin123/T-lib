@@ -1,10 +1,10 @@
 from model import (create_database, add_book, get_all_books,
                    delete_book, get_book, change_status_favorite,
-                   get_favorite_books, get_read, get_unread)
+                   get_favorite_books, get_read, get_unread, change_details)
 import getpass
 import json
 
-#TO DO получение книг по фильтру, измениение сведений о книге
+#TO DO получение книг по фильтру
 # example "Название", "Автор", "Жанр", "Дата", "Описание", True, True
 
 default_username = getpass.getuser()
@@ -77,7 +77,8 @@ commands = {
     "favorite": change_status_favorite,
     "set_username": set_username,
     "read": get_read,
-    "unread": get_unread
+    "unread": get_unread,
+    "change": change_details
 }
 
 if __name__ == "__main__":
