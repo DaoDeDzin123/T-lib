@@ -1,5 +1,6 @@
 from typing import  Optional
-from sqlalchemy import create_engine, String, select, Boolean, or_
+from datetime import date
+from sqlalchemy import create_engine, String, select, Boolean, or_, Date
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session
 
 engine = create_engine("sqlite:///library.db")
@@ -14,7 +15,7 @@ class Book(Base):
     name: Mapped[str] = mapped_column(String(48), unique= True)
     author: Mapped[Optional[str]] = mapped_column(String(48))
     genre: Mapped[Optional[str]] = mapped_column(String(48))
-    date: Mapped[Optional[str]] = mapped_column(String(48))
+    date: Mapped[Optional[int]] = mapped_column()
     description: Mapped[Optional[str]] = mapped_column(String(256))
     favorites: Mapped[bool] = mapped_column(Boolean)
     read: Mapped[bool] = mapped_column(Boolean)
@@ -57,21 +58,12 @@ def get_all_books():
         else:
             print("В вашей библиотеке нет книг")
 
-def search_book_keyword(keyword):
+def get_book(name: str):
     with Session(engine) as session:
-        books = session.query(Book).filter(
-            or_(
-                Book.name.ilike(f"%{keyword}%"),
-                Book.author.ilike(f"%{keyword}%"),
-                Book.description.ilike(f"%{keyword}%")
-            )
-        ).all()
-        if books:
-            print("Результаты поиска:")
-            for book in books:
-                print(book.name)
-        else:
-            print("Ничего не найдено")
+        book = session.query(Book).filter(Book.name == name).one()
+        print(f"О книге: \nНазвание: {book.name} \nАвтор: {book.author} \nЖанр: {book.genre}"
+              f" \nДата издания: {book.date} \nИзбранное: {convert_bool(book.favorites)}"
+              f" \nПрочитано: {convert_bool(book.read)} \nОписание: {book.description}")
 
 def get_author_books(author):
     with Session(engine) as session:
@@ -123,13 +115,6 @@ def get_unread():
         else:
             print("У вас нет непрочитанных книг")
 
-def get_book(name: str):
-    with Session(engine) as session:
-        book = session.query(Book).filter(Book.name == name).one()
-        print(f"О книге: \nНазвание: {book.name} \nАвтор: {book.author} \nЖанр: {book.genre}"
-              f" \nДата издания: {book.date} \nИзбранное: {convert_bool(book.favorites)}"
-              f" \nПрочитано: {convert_bool(book.read)} \nОписание: {book.description}")
-
 def change_status_favorite(name: str):
     with Session(engine) as session:
         book = session.query(Book).filter(Book.name == name).first()
@@ -164,3 +149,19 @@ def delete_book(name):
             print(f"Книга {name} успешно удалена")
         else:
             print("Такой книги не существует")
+
+def search_book_keyword(keyword):
+    with Session(engine) as session:
+        books = session.query(Book).filter(
+            or_(
+                Book.name.ilike(f"%{keyword}%"),
+                Book.author.ilike(f"%{keyword}%"),
+                Book.description.ilike(f"%{keyword}%")
+            )
+        ).all()
+        if books:
+            print("Результаты поиска:")
+            for book in books:
+                print(book.name)
+        else:
+            print("Ничего не найдено")

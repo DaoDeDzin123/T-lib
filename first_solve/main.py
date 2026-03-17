@@ -1,10 +1,10 @@
 from model import (create_database, add_book, get_all_books,
                    delete_book, get_book, change_status_favorite,
-                   get_favorite_books, get_read, get_unread, change_details, get_genre_books, get_author_books, search_book_keyword)
+                   get_favorite_books, get_read, get_unread, change_details,
+                   get_genre_books, get_author_books, search_book_keyword)
 import getpass
 import json
 
-#TO DO получение книг по фильтру
 # example "Название", "Автор", "Жанр", "Дата", "Описание", True, True
 
 default_username = getpass.getuser()
@@ -28,6 +28,10 @@ def greeting():
             json.dump(config, file, indent=4, ensure_ascii=False)
         print("Давайте добавим вашу первую книгу!\n")
 
+def get_commands():
+    print("Вот список команд:")
+    for command in directory:
+        print(command)
 
 def set_username(new_username):
     config = get_config()
@@ -36,12 +40,6 @@ def set_username(new_username):
     with open("config.json", "w", encoding="utf-8") as file:
         json.dump(config, file, indent=4, ensure_ascii=False)
     print(f"Задано имя пользователя {new_username}")
-
-
-def get_commands():
-    print("Вот список команд:")
-    for command in directory:
-        print(command)
 
 def command_manager(input_command):
     paths_command = input_command.split()
@@ -63,7 +61,11 @@ directory = [
     "favorite <название_книги> - удаляет из избранного или добавляет в избранное",
     "set_username <имя_пользователя> - задаёт имя пользователя",
     "read - выводит прочитанные книги",
-    "unread - выводит непрочитанные книги"
+    "unread - выводит непрочитанные книги",
+    "change <имя_книги> <параметр> <новое_значение> - изменить параметр книги",
+    "genre <имя_жанра> - поиск по жанру",
+    "author <имя_автора> - поиск по автору",
+    "keyword <ключевое слово> - поиск по ключевому слову"
 ]
 
 commands = {
