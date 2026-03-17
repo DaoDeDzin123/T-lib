@@ -35,21 +35,60 @@ def add_book(name: str, author = None, genre = None, date = None,
                         description= description, favorites= favorites, read = read)
         session.add(new_book)
         session.commit()
-    print("Книга успешно добавлена")
+    print(f"Книга {name} успешно добавлена")
 
 def get_all_books():
-    print("Книги из вашей библиотеки:")
     with Session(engine) as session:
         books = session.execute(select(Book)).scalars()
-        for book in books:
-            print(book.name)
+        if books:
+            print("Книги из вашей библиотеки:")
+            for book in books:
+                print(book.name)
 
-def get_book(name):
+def get_favorite_books():
     with Session(engine) as session:
-        book = session.query(Book).filter(Book.name == name).first()
+        books = session.query(Book).filter(Book.favorites == True).all()
+        if books:
+            print("Избранные книги:")
+            for book in books:
+                print(book.name)
+
+def get_read():
+    with Session(engine) as session:
+        books = session.query(Book).filter(Book.read == True).all()
+        if books:
+            print("Прочитанные книги:")
+            for book in books:
+                print(book.name)
+        else:
+            print("У вас нет прочитанных книг")
+
+def get_unread():
+    with Session(engine) as session:
+        books = session.query(Book).filter(Book.read == False).all()
+        if books:
+            print("Непрочитанные книги:")
+            for book in books:
+                print(book.name)
+        else:
+            print("У вас нет непрочитанных книг")
+
+def get_book(name: str):
+    with Session(engine) as session:
+        book = session.query(Book).filter(Book.name == name).one()
         print(f"О книге: \nНазвание: {book.name} \nАвтор: {book.author} \nЖанр: {book.genre}"
               f" \nДата издания: {book.date} \nИзбранное: {convert_bool(book.favorites)}"
               f" \nПрочитано: {convert_bool(book.read)} \nОписание: {book.description}")
+
+def change_status_favorite(name: str):
+    with Session(engine) as session:
+        book = session.query(Book).filter(Book.name == name).first()
+        book.favorites = not book.favorites
+        session.commit()
+        if book.favorites is True:
+            print(f"Книга {name} добавлена в избранное")
+        else:
+            print(f"Книга {name} убрана из избранного")
 
 def delete_book(name):
     with Session(engine) as session:
@@ -57,6 +96,6 @@ def delete_book(name):
         if book:
             session.delete(book)
             session.commit()
-            print("Книга успешно удалена")
+            print(f"Книга {name} успешно удалена")
         else:
             print("Такой книги не существует")

@@ -1,0 +1,12 @@
+Первое решение:
+
+Функции:
+
+create_database
+convert_bool
+add_book
+get_all_books
+get_favorite_books
+get_book
+change_status_favorite
+delete_book
