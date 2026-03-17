@@ -1,6 +1,6 @@
 from model import (create_database, add_book, get_all_books,
                    delete_book, get_book, change_status_favorite,
-                   get_favorite_books, get_read, get_unread, change_details)
+                   get_favorite_books, get_read, get_unread, change_details, get_genre_books, get_author_books, search_book_keyword)
 import getpass
 import json
 
@@ -43,7 +43,6 @@ def get_commands():
     for command in directory:
         print(command)
 
-
 def command_manager(input_command):
     paths_command = input_command.split()
     length = len(paths_command)
@@ -78,7 +77,10 @@ commands = {
     "set_username": set_username,
     "read": get_read,
     "unread": get_unread,
-    "change": change_details
+    "change": change_details,
+    "genre": get_genre_books,
+    "author": get_author_books,
+    "keyword": search_book_keyword
 }
 
 if __name__ == "__main__":

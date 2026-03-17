@@ -1,5 +1,5 @@
 from typing import  Optional
-from sqlalchemy import create_engine, String, select, Boolean
+from sqlalchemy import create_engine, String, select, Boolean, or_
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session
 
 engine = create_engine("sqlite:///library.db")
@@ -54,6 +54,44 @@ def get_all_books():
             print("Книги из вашей библиотеки:")
             for book in books:
                 print(book.name)
+        else:
+            print("В вашей библиотеке нет книг")
+
+def search_book_keyword(keyword):
+    with Session(engine) as session:
+        books = session.query(Book).filter(
+            or_(
+                Book.name.ilike(f"%{keyword}%"),
+                Book.author.ilike(f"%{keyword}%"),
+                Book.description.ilike(f"%{keyword}%")
+            )
+        ).all()
+        if books:
+            print("Результаты поиска:")
+            for book in books:
+                print(book.name)
+        else:
+            print("Ничего не найдено")
+
+def get_author_books(author):
+    with Session(engine) as session:
+        books = session.query(Book).filter(Book.author == author).all()
+        if books:
+            print(f"Ваши автора {author}:")
+            for book in books:
+                print(book.name)
+        else:
+            print("У вас нет книг этого автора")
+
+def get_genre_books(genre):
+    with Session(engine) as session:
+        books = session.query(Book).filter(Book.genre == genre).all()
+        if books:
+            print(f"Ваши книги в жанре {genre}:")
+            for book in books:
+                print(book.name)
+        else:
+            print("У вас нет книг этого жанра")
 
 def get_favorite_books():
     with Session(engine) as session:
@@ -62,6 +100,8 @@ def get_favorite_books():
             print("Избранные книги:")
             for book in books:
                 print(book.name)
+        else:
+            print("У вас нет избранных книг")
 
 def get_read():
     with Session(engine) as session:
@@ -93,19 +133,25 @@ def get_book(name: str):
 def change_status_favorite(name: str):
     with Session(engine) as session:
         book = session.query(Book).filter(Book.name == name).first()
-        book.favorites = not book.favorites
-        session.commit()
-        if book.favorites is True:
-            print(f"Книга {name} добавлена в избранное")
+        if book:
+            book.favorites = not book.favorites
+            session.commit()
+            if book.favorites is True:
+                print(f"Книга {name} добавлена в избранное")
+            else:
+                print(f"Книга {name} убрана из избранного")
         else:
-            print(f"Книга {name} убрана из избранного")
+            print("Такой книги не существует")
 
 def change_details(name, field, value):
     with Session(engine) as session:
         book = session.query(Book).filter(Book.name == name).one()
-        setattr(book, columns[field], value)
-        session.commit()
-    print("Значение изменено")
+        if book:
+            setattr(book, columns[field], value)
+            session.commit()
+            print("Значение изменено")
+        else:
+            print("Такой книги не существует")
 
 
 
