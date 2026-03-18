@@ -2,6 +2,16 @@ from typing import  Optional
 from sqlalchemy import create_engine, String, select, Boolean, or_, Date
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session
 
+columns = {
+    "название": "name",
+    "автор": "author",
+    "жанр": "genre",
+    "дата": "date",
+    "описание": "description",
+    "избранное": "favorites",
+    "прочитано": "read",
+}
+
 engine = create_engine("sqlite:///library.db")
 
 class Base(DeclarativeBase):
@@ -19,15 +29,7 @@ class Book(Base):
     favorites: Mapped[bool] = mapped_column(Boolean)
     read: Mapped[bool] = mapped_column(Boolean)
 
-columns = {
-    "название": "name",
-    "автор": "author",
-    "жанр": "genre",
-    "дата": "date",
-    "описание": "description",
-    "избранное": "favorites",
-    "прочитано": "read",
-}
+
 
 def create_database():
     Base.metadata.create_all(engine)

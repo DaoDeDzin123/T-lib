@@ -1,3 +1,8 @@
+from model import (add_book, get_all_books,
+                   delete_book, get_book, change_status_favorite,
+                   get_favorite_books, get_read, get_unread, change_details,
+                   get_genre_books, get_author_books, search_book_keyword)
+
 directory = [
     "help - выводит список команд",
     "view_books - выводит все книги из вашей библиотеки",
@@ -19,4 +24,21 @@ default_config = {
     "default_username": False,
     "username": "Cookie",
     "first_time": False
+}
+
+commands = {
+    #"help": get_commands,
+    "view_books": get_all_books,
+    "view_favorites": get_favorite_books,
+    "add_book": add_book,
+    "look_about": get_book,
+    "delete": delete_book,
+    "favorite": change_status_favorite,
+    #"set_username": set_username,
+    "read": get_read,
+    "unread": get_unread,
+    "change": change_details,
+    "genre": get_genre_books,
+    "author": get_author_books,
+    "keyword": search_book_keyword
 }

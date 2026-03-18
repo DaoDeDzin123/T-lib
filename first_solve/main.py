@@ -1,11 +1,7 @@
 from json import JSONDecodeError
-from reference_data import directory, default_config
+from reference_data import directory, default_config, commands
 import os
-
-from model import (create_database, add_book, get_all_books,
-                   delete_book, get_book, change_status_favorite,
-                   get_favorite_books, get_read, get_unread, change_details,
-                   get_genre_books, get_author_books, search_book_keyword, convert_y_n)
+from model import create_database, convert_y_n
 from getpass import getuser
 import json
 
@@ -18,12 +14,10 @@ def check_config():
         if os.path.exists("config.json"):
             pass
         else:
-            # default_json = json.dumps(default_config, ensure_ascii=False, indent=4)
             with open("config.json", "w") as file:
                 json.dump(default_config, file)
     except JSONDecodeError or TypeError:
         os.remove("config.json")
-        # default_json = json.dumps(default_config, ensure_ascii=False, indent=4)
         with open("config.json", "w") as file:
             json.dump(default_config, file)
 
@@ -84,26 +78,15 @@ def command_manager(input_command):
     except Exception as e:
         print(f"Ошибка в command_maneger {e}")
 
-commands = {
-    "help": get_commands,
-    "view_books": get_all_books,
-    "view_favorites": get_favorite_books,
-    "add_book": add_book,
-    "look_about": get_book,
-    "delete": delete_book,
-    "favorite": change_status_favorite,
-    "set_username": set_username,
-    "read": get_read,
-    "unread": get_unread,
-    "change": change_details,
-    "genre": get_genre_books,
-    "author": get_author_books,
-    "keyword": search_book_keyword
-}
+commands["help"] = get_commands
+commands["set_username"] = set_username
 
 if __name__ == "__main__":
-    create_database()
-    greeting()
-    while True:
-        input_command = input()
-        command_manager(input_command)
+    try:
+        create_database()
+        greeting()
+        while True:
+            input_command = input()
+            command_manager(input_command)
+    except KeyboardInterrupt:
+        print("До встречи!")
