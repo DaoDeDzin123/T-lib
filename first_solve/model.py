@@ -1,5 +1,4 @@
 from typing import  Optional
-from datetime import date
 from sqlalchemy import create_engine, String, select, Boolean, or_, Date
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session
 
@@ -38,6 +37,15 @@ def convert_bool(val):
         return "Дa"
     else:
         return "Нет"
+
+def convert_y_n(val):
+    val_1 = val.lower()
+    if val_1 == "да":
+        return True
+    elif val_1 == "нет":
+        return False
+    else:
+        return val
 
 def add_book(name: str, author = None, genre = None, date = None,
              description = None, favorites = False, read = False):

@@ -1,16 +1,35 @@
+from json import JSONDecodeError
+from reference_data import directory, default_config
+import os
+
 from model import (create_database, add_book, get_all_books,
                    delete_book, get_book, change_status_favorite,
                    get_favorite_books, get_read, get_unread, change_details,
-                   get_genre_books, get_author_books, search_book_keyword)
-import getpass
+                   get_genre_books, get_author_books, search_book_keyword, convert_y_n)
+from getpass import getuser
 import json
 
 # example "Название", "Автор", "Жанр", "Дата", "Описание", True, True
 
-default_username = getpass.getuser()
+default_username = getuser()
+
+def check_config():
+    try:
+        if os.path.exists("config.json"):
+            pass
+        else:
+            # default_json = json.dumps(default_config, ensure_ascii=False, indent=4)
+            with open("config.json", "w") as file:
+                json.dump(default_config, file)
+    except JSONDecodeError or TypeError:
+        os.remove("config.json")
+        # default_json = json.dumps(default_config, ensure_ascii=False, indent=4)
+        with open("config.json", "w") as file:
+            json.dump(default_config, file)
 
 def get_config():
-    with open("config.json", "r", encoding="utf-8") as file:
+    check_config()
+    with open("config.json", "r") as file:
         config = json.load(file)
     return config
 
@@ -22,11 +41,15 @@ def greeting():
         print(f"Добро пожаловать в библиотеку, {config['username']}!")
 
     if config["first_time"] is True:
-        get_commands()
-        config["first_time"] = False
-        with open("config.json", "w", encoding="utf-8") as file:
-            json.dump(config, file, indent=4, ensure_ascii=False)
-        print("Давайте добавим вашу первую книгу!\n")
+        try:
+            get_commands()
+            config["first_time"] = False
+            with open("config.json", "w") as file:
+                json.dump(config, file)
+            print("Давайте добавим вашу первую книгу!\n")
+        except Exception as e:
+            print(f"Ошибка в greeting {e}")
+
 
 def get_commands():
     print("Вот список команд:")
@@ -37,36 +60,29 @@ def set_username(new_username):
     config = get_config()
     config["default_username"] = False
     config["username"] = new_username
-    with open("config.json", "w", encoding="utf-8") as file:
-        json.dump(config, file, indent=4, ensure_ascii=False)
+    with open("config.json", "w") as file:
+        json.dump(config, file)
     print(f"Задано имя пользователя {new_username}")
 
 def command_manager(input_command):
-    paths_command = input_command.split()
-    length = len(paths_command)
-    if length > 1:
-        commands[paths_command[0]](*paths_command[1:])
-    elif length == 1:
-        commands[paths_command[0]]()
-    else:
-        pass
-
-directory = [
-    "help - выводит список команд",
-    "view_books - выводит все книги из вашей библиотеки",
-    "view_favorites - выводит все книги из избранного",
-    "add_book <название_книги> (Опционально: <автор> <жанр> <дата_издания> <описание> <добавить_в_избранное:Да/Нет> <прочитано:Да/Нет>) - добавляет книгу",
-    "look_about <название_книги> - выводит характеристики книги",
-    "delete <название_книги> - удаляет книгу",
-    "favorite <название_книги> - удаляет из избранного или добавляет в избранное",
-    "set_username <имя_пользователя> - задаёт имя пользователя",
-    "read - выводит прочитанные книги",
-    "unread - выводит непрочитанные книги",
-    "change <имя_книги> <параметр> <новое_значение> - изменить параметр книги",
-    "genre <имя_жанра> - поиск по жанру",
-    "author <имя_автора> - поиск по автору",
-    "keyword <ключевое слово> - поиск по ключевому слову"
-]
+    try:
+        paths_command = input_command.split()
+        length = len(paths_command)
+        if length > 1:
+                new_paths_command = []
+                for i in paths_command:
+                    new_paths_command.append(convert_y_n(i))
+                commands[paths_command[0]](*new_paths_command[1:])
+        elif length == 1:
+            commands[paths_command[0]]()
+        else:
+            pass
+    except KeyError:
+        print("Нет такой команды. Введите help для списка доступных команд")
+    except ValueError or TypeError:
+        print("Введите корректные данные")
+    except Exception as e:
+        print(f"Ошибка в command_maneger {e}")
 
 commands = {
     "help": get_commands,
