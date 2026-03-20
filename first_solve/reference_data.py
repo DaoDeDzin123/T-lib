@@ -21,7 +21,7 @@ directory = [
 ]
 
 default_config = {
-    "default_username": False,
+    "default_username": True,
     "username": "Cookie",
     "first_time": False
 }
